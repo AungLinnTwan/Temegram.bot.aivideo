@@ -14,8 +14,8 @@ GEMINI_API_KEY = "AIzaSyAwwSlzAUpRaKRjIpFPeQd704aEJz-EVOo"
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "google_credentials.json"
 genai_client = genai.Client(api_key=GEMINI_API_KEY)
 
-print("Loading Whisper Model...")
-whisper_model = whisper.load_model("tiny")
+import whisper
+model = whisper.load_model("tiny")  # หรือ "base" လို့ ပြောင်းပေးပါ
 
 def format_timestamp(seconds):
     millis = int((seconds % 1) * 1000)
