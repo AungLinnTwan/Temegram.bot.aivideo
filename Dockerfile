@@ -1,25 +1,16 @@
 FROM python:3.10-slim
 
-# FFmpeg နှင့် အခြေခံ System Packages များ Install လုပ်ခြင်း
-RUN apt-get update && apt-get install -y \
-    ffmpeg \
-    git \
-    && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /app
 
-# Dependency ဖိုင်များ ကူးယူခြင်း
-COPY . /app
+# System dependencies (ffmpeg စသည်တို့ ထည့်သွင်းရန်)
+RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
 
-# Python Libraries များ Install လုပ်ခြင်း
-RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir \
-    python-telegram-bot \
-    yt-dlp \
-    openai-whisper \
-    google-genai \
-    google-cloud-texttospeech \
-    google-auth
+# Python packages များကို requirements.txt မှတစ်ဆင့် Install လုပ်ရန်
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Bot ကို စတင် Run ခြင်း
+# ပရိုဂျက်ဖိုင်များ အားလုံးကို ကူးယူရန်
+COPY . .
+
+# Bot ကို စတင် Run ရန်
 CMD ["python", "bot.py"]
