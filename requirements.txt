@@ -1,6 +1,8 @@
+flask
+python-telegram-bot
+groq
 edge-tts
 yt-dlp
+whisper
 openai-whisper
-groq
-python-telegram-bot
 Pillow
