@@ -19,7 +19,6 @@ GROQ_API_KEY = "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"
 # ⚙️ Initial Setup
 # ==========================================
 print("Loading Whisper Model... (Please wait)")
-whisper_model = whisper.load_model("tiny")
 groq_client = Groq(api_key=GROQ_API_KEY)
 
 # dummy logo ဖန်တီးရန် (logo.png မရှိပါက Error မတက်စေရန်)
@@ -138,12 +137,20 @@ async def process_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Thumbnail ဖန်တီးခြင်း
         subprocess.run(['ffmpeg', '-y', '-ss', '00:00:50', '-i', input_vid, '-vframes', '1', thumbnail_file], check=True)
 
-        # [2/5] Whisper ဖြင့် စာသားပြောင်းခြင်း
-        print("[2/5] Whisper ဖြင့် စာသားပြောင်းနေပါသည်...")
-        await status_msg.edit_text("🎙️ [2/5]: Whisper ဖြင့် စာသား ထုတ်ယူနေပါသည်...")
+        # [2/5] Groq Whisper API ဖြင့် စာသားပြောင်းခြင်း (RAM လုံးဝမစားပါ)
+        print("[2/5] Groq Whisper API ဖြင့် စာသားပြောင်းနေပါသည်...")
+        await status_msg.edit_text("🎙️ [2/5]: Groq API ဖြင့် စာသား ထုတ်ယူနေပါသည်...")
         
-        result = await asyncio.to_thread(whisper_model.transcribe, input_vid)
-        original_text = result["text"]
+        def transcribe_audio():
+            with open(input_vid, "rb") as audio_f:
+                transcript = groq_client.audio.transcriptions.create(
+                    file=(input_vid, audio_f.read()),
+                    model="whisper-large-v3-turbo",
+                    response_format="text"
+                )
+            return transcript
+
+        original_text = await asyncio.to_thread(transcribe_audio)
 
         # [3/5] Groq ဖြင့် ဘာသာပြန်ခြင်း (အင်္ဂလိပ်စာလုံးများကို အင်္ဂလိပ်လိုအတိုင်း ချန်ထားမည်)
         print("[3/5] Groq ဖြင့် ဘာသာပြန်နေပါသည်...")
