@@ -1,0 +1,6 @@
+edge-tts
+yt-dlp
+openai-whisper
+groq
+python-telegram-bot
+Pillow
